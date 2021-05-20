@@ -27,7 +27,7 @@ class CircularClipRoute<T> extends PageRoute<T> {
   ///
   /// * [CircularClipTransition.expandingRect], which is what [expandFrom] is
   /// used to calculate.
-  final BuildContext expandFrom;
+  final BuildContext? expandFrom;
 
   /// Builds the primary contents of the route.
   final WidgetBuilder builder;
@@ -70,16 +70,18 @@ class CircularClipRoute<T> extends PageRoute<T> {
 
   void _updateExpandingRect() {
     setState(() {
-      assert(expandFrom.findRenderObject() is RenderBox);
-      final expandFromRenderBox = expandFrom.findRenderObject() as RenderBox;
-      final expandFromTransform = expandFromRenderBox.getTransformTo(null);
+      assert(expandFrom?.findRenderObject() is RenderBox?);
+      final expandFromRenderBox = expandFrom?.findRenderObject() as RenderBox?;
+      final expandFromTransform =
+          expandFromRenderBox?.getTransformTo(null) ?? Matrix4.identity();
       final navigatorTransform =
           navigator!.context.findRenderObject()!.getTransformTo(null);
+
       final transform = expandFromTransform
         ..multiply(Matrix4.tryInvert(navigatorTransform)!);
       _expandingRect = MatrixUtils.transformRect(
         transform,
-        Offset.zero & expandFromRenderBox.size,
+        Offset.zero & (expandFromRenderBox?.size ?? Size(10, 10)),
       );
     });
   }
