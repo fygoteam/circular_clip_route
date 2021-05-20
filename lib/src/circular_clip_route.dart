@@ -14,6 +14,8 @@ class CircularClipRoute<T> extends PageRoute<T> {
     this.border = CircularClipTransition.kDefaultBorder,
     this.shadow = CircularClipTransition.kDefaultShadow,
     this.maintainState = false,
+    this.transform,
+    this.size,
     this.transitionDuration = const Duration(milliseconds: 500),
   });
 
@@ -47,6 +49,10 @@ class CircularClipRoute<T> extends PageRoute<T> {
   /// {@macro CircularClipTransition.shadow}
   final List<BoxShadow>? shadow;
 
+  final Matrix4? transform;
+
+  final Size? size;
+
   @override
   final bool maintainState;
 
@@ -74,8 +80,8 @@ class CircularClipRoute<T> extends PageRoute<T> {
       final expandFromRenderBox = expandFrom?.findRenderObject() as RenderBox?;
 
       final expandFromTransform = expandFromRenderBox?.getTransformTo(null) ??
-          Matrix4.translationValues(
-              MediaQuery.of(navigator!.context).size.width / 2, 0, 0);
+          this.transform ??
+          Matrix4.identity();
       final navigatorTransform =
           navigator!.context.findRenderObject()!.getTransformTo(null);
 
@@ -83,7 +89,7 @@ class CircularClipRoute<T> extends PageRoute<T> {
         ..multiply(Matrix4.tryInvert(navigatorTransform)!);
       _expandingRect = MatrixUtils.transformRect(
         transform,
-        Offset.zero & (expandFromRenderBox?.size ?? Size(10, 10)),
+        Offset.zero & (expandFromRenderBox?.size ?? this.size ?? Size(10, 10)),
       );
     });
   }
